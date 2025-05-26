@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic
+CFLAGS = -Wall -Wextra -pedantic -Wno-implicit-function-declaration
 
 TARGET = webserver
 SRC = $(wildcard *.c)

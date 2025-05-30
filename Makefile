@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -pedantic
 
-TARGET = webserver.out
+TARGET = webserver
 SRC = $(wildcard *.c)
 # searches for all *.c files in the directory
 

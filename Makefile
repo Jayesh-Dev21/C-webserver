@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -pedantic
 
 TARGET = webserver
-SRC = $(wildcard *.c)
+SRC = $(wildcard src/*.c)
 # searches for all *.c files in the directory
 
 OBJ = $(SRC:.c=.o)

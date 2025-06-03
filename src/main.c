@@ -2,70 +2,87 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-// #include <errno.h>
-// #include <time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <time.h>
+#include <errno.h> //for multithreaded
+#include <arpa/inet.h>
 
 #define port 3003
 
 typedef enum{false,true}bool;
 
-int main(int argc, char* argv[]){
-    
-    char buff[256] = {0};
-    size_t buff_size = sizeof(buff);
+int error_ret(){
+    return -1;
+}
 
-    struct sockaddr_in addr; //socket.h 
+int main(int argc, char* argv[]){
+
+    //initialising boolean condition 
+    bool condition = false;
+
+    // choosing a port
+    uint16_t por_t = htons(port);
+    // A char buffer for the requests, with all values 0x000
+    char buff[1024] = {0};
+
+    size_t size_buff = sizeof(buff);
+
+    struct sockaddr_in addr; // from socket.h
     socklen_t addr_len = sizeof(addr);
 
-    int socket_fd = socket(AF_INET, SOCK_STREAM, 0);   
-    int accept_fd;
 
-    const char *response = "HTTP/1.1 200 OK\r\nContent-Length: 14\r\n\r\nHello, World!\n";
-    
-    // socket_fd => socket_file_descriptor
-    if(-1 == socket_fd){
-        perror("Unable to create socket");
-        exit(1);
-    }
-    
-    addr.sin_port = htons(3003); // or 3003 => 0x0BBB and reverse it => 0xBBB0
     addr.sin_family = AF_INET;
-    addr.sin_addr.s_addr = INADDR_ANY;
+    addr.sin_port = por_t;
+    addr.sin_addr.s_addr = INADDR_ANY; //uses your IPV4 address
     
-    int bind_fd = bind(socket_fd, (struct sockaddr*)&addr, sizeof(addr));
-
-    if(0 > bind_fd) {
-        perror("Bind failure");
-        exit(1);
-    }
-    
-    if(listen(socket_fd, 5) < 0){
-        perror("Listen failed");
-        exit(1);
+    int sockfd = socket(PF_INET, SOCK_STREAM, 0); //or listener
+    if(-1 == sockfd){
+        perror("Error in creating socket\n");
+        // or use fprintf(stderr, "Error in creating socket"); to return directly to std-error
+        return error_ret();
     }
 
-    printf( "Server running on port %d\n", port );
+    // printf("%hu", INADDR_ANY); => 0
 
-    bool is_listening = true;
+    sleep(1);
 
-    while(is_listening){
-        
-        accept_fd = accept(socket_fd, (struct sockaddr*)&addr, &addr_len);
-        
-        if (accept_fd < 0) {
-            perror("Accept failed");
-            continue;
+    // bind file descriptor
+    int bindfd = bind(sockfd, (struct sockaddr*)&addr, sizeof addr);
+    if(-1 == bindfd){
+        perror("Error in creating bindfd\n");
+        return error_ret();
+    }
+    //bindfd returns 0 for success or -1 for ^^^ error 
+    
+    unsigned short backlog; 
+    // here backlog is how many pending connections you can have before the kernel starts rejecting new one
+    if(-1 == listen(sockfd, backlog)){
+        perror("Error establishing connection, check previous number of requests\n");
+        return error_ret();
+    } 
+
+    fprintf(stdout, "Server started on %d\nconnect via: http://localhost:%d\n", port, port);
+
+    const char* response = "HTTP/1.1 200 OK\r\nContent-Length: 14\r\n\r\nHello, World!\n";
+    const int response_len = strlen(response);
+
+    sleep(1);
+
+    while(!condition){
+
+       int newfd = accept(sockfd, (struct sockaddr*)&addr, &addr_len);
+        if(-1 == newfd){
+            perror("Error accepting connection and reciveing a socked descriptor\n");
+            return error_ret();
         }
-        
-        read(accept_fd, buff, buff_size);
-        printf("Request received:\n%s\n", buff);
 
-        write(accept_fd, response, strlen(response));   
+        read(newfd, buff, size_buff);
+        fprintf(stdout, "Request Recived via port: %d\nconnect via: http://localhost:%d\n%s\n\n", port, port, buff);
+        write(newfd, response, response_len);
 
-        close(accept_fd);
+        close(newfd);
     }
-
-    return 0;
+    
+    return 0;   
 }

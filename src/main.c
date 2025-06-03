@@ -73,7 +73,7 @@ int main(int argc, char* argv[]){
 
        int newfd = accept(sockfd, (struct sockaddr*)&addr, &addr_len);
         if(-1 == newfd){
-            perror("Error accepting connection and reciveing a socked descriptor\n");
+            perror("Error accepting connection and reciveing a socket descriptor\n");
             return error_ret();
         }
 

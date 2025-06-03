@@ -77,7 +77,12 @@ int main(int argc, char* argv[]){
             return error_ret();
         }
 
-        read(newfd, buff, size_buff);
+        int read_d = read(newfd, buff, size_buff);
+        if(-1 == read_d){
+            perror("Error reading from socket\n");
+            close(newfd);
+            continue;
+        }
         fprintf(stdout, "Request Recived via port: %d\nconnect via: http://localhost:%d\n%s\n\n", port, port, buff);
         write(newfd, response, response_len);
 

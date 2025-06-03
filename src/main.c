@@ -55,7 +55,7 @@ int main(int argc, char* argv[]){
     }
     //bindfd returns 0 for success or -1 for ^^^ error 
     
-    unsigned short backlog; 
+    unsigned short backlog = 10; 
     // here backlog is how many pending connections you can have before the kernel starts rejecting new one
     if(-1 == listen(sockfd, backlog)){
         perror("Error establishing connection, check previous number of requests\n");

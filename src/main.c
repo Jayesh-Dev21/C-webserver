@@ -42,13 +42,13 @@ int main(int argc, char* argv[]){
 
     size_t size_buff = sizeof(buff);
 
-    struct sockaddr_in addr; // from socket.h
-    socklen_t addr_len = sizeof(addr);
+    struct sockaddr_in hint; // from socket.h
+    socklen_t addr_len = sizeof(hint);
 
 
-    addr.sin_family = AF_INET;
-    addr.sin_port = por_t;
-    addr.sin_addr.s_addr = INADDR_ANY; //uses your IPV4 address
+    hint.sin_family = AF_INET;
+    hint.sin_port = por_t; // stored as big endian
+    hint.sin_addr.s_addr = INADDR_ANY; //uses your IPV4 address
     
     int sockfd = socket(PF_INET, SOCK_STREAM, 0); //or listener
     if(-1 == sockfd){
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]){
     sleep(1);
 
     // bind file descriptor
-    int bindfd = bind(sockfd, (struct sockaddr*)&addr, sizeof addr);
+    int bindfd = bind(sockfd, (struct sockaddr*)&hint, sizeof hint);
     if(-1 == bindfd){
         perror("Error in creating bindfd\n");
         return error_ret();
@@ -85,20 +85,20 @@ int main(int argc, char* argv[]){
 
     while(!condition){
 
-       int newfd = accept(sockfd, (struct sockaddr*)&addr, &addr_len);
-        if(-1 == newfd){
+       int clientsocket = accept(sockfd, (struct sockaddr*)&hint, &addr_len);
+        if(-1 == clientsocket){
             perror("Error accepting connection and reciveing a socket descriptor\n");
             return error_ret();
         }
 
-        int read_d = read(newfd, buff, size_buff);
+        int read_d = read(clientsocket, buff, size_buff);
         if(-1 == read_d){
             perror("Error reading from socket\n");
-            close(newfd);
+            close(clientsocket);
             continue;
         }
         fprintf(stdout, "Request Recived via port: %d\nconnect via: http://localhost:%d\n%s\n\n", port, port, buff);
-        // write(newfd, response, response_len);
+        // write(clientsocket, response, response_len);
 
         // !! new shit !! // 
         // ^ Help of ai ^ //
@@ -118,8 +118,8 @@ int main(int argc, char* argv[]){
         FILE* file = fopen(full_path, "rb");
         if (!file) {
             const char* not_found = "HTTP/1.1 404 Not Found\r\nContent-Length: 13\r\n\r\n404 Not Found";
-            write(newfd, not_found, strlen(not_found));
-            close(newfd);
+            write(clientsocket, not_found, strlen(not_found));
+            close(clientsocket);
             continue;
         }
 
@@ -136,13 +136,13 @@ int main(int argc, char* argv[]){
         snprintf(header, sizeof(header),
             "HTTP/1.1 200 OK\r\nContent-Type: %s\r\nContent-Length: %ld\r\n\r\n", mime, filesize);
 
-        write(newfd, header, strlen(header));
-        write(newfd, file_buf, filesize);
+        write(clientsocket, header, strlen(header));
+        write(clientsocket, file_buf, filesize);
 
         free(file_buf);
         // ^^ ^^//
 
-        close(newfd);
+        close(clientsocket);
     }
     
     return 0;   

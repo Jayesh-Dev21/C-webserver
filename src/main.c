@@ -23,7 +23,6 @@ int main(int argc, char* argv[]){
     struct sockaddr_in hint; // from socket.h
     socklen_t addr_len = sizeof(hint);
 
-
     hint.sin_family = AF_INET;
     hint.sin_port = por_t; // stored as big endian
     hint.sin_addr.s_addr = INADDR_ANY; //uses your IPV4 address
@@ -80,7 +79,6 @@ int main(int argc, char* argv[]){
         fprintf(stdout, "Request Recived via port: %d\nconnect via: http://localhost:%d\n%s\n\n", port, port, buff);
         // write(clientsocket, response, response_len);
 
-        // !! new shit !! // 
         // ^ Help of ai ^ //
 
         char method[8], path[1024];

@@ -91,6 +91,8 @@ int main(int argc, char* argv[]){
             return error_ret();
         }
 
+        memset(buff, 0, size_buff);
+
         int read_d = read(clientsocket, buff, size_buff);
         if(-1 == read_d){
             perror("Error reading from socket\n");

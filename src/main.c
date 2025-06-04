@@ -8,7 +8,6 @@ int error_ret(){
     return -1;
 }
 
-
 int main(int argc, char* argv[]){
 
     //initialising boolean condition 

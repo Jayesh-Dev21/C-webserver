@@ -115,7 +115,7 @@ int main(int argc, char* argv[]){
             strcpy(path, "/static/response/403.html");
         }
 
-        if(strstr(path, "..") > 0) {
+        if(strstr(path, "..") != NULL){
             strcpy(path, "/static/response/403.html");  // You can make a 403.html
         }
 

@@ -87,45 +87,45 @@ int main(int argc, char* argv[]){
             strcpy(path, "/index.html");
         }
 
-        if(strcmp(path, "/about") == 0){
+        else if(strcmp(path, "/about") == 0){
             strcpy(path, "/static/about.html");
         }
 
-        if(strcmp(path, "/404") == 0){
+        else if(strcmp(path, "/404") == 0){
             strcpy(path, "/static/response/404.html");
         }
 
-        if(strcmp(path, "/page-1") == 0){
+        else if(strcmp(path, "/page-1") == 0){
             strcpy(path, "/static/wow.html");
         }
 
-        if(strcmp(path, "/page-2") == 0){
+        else if(strcmp(path, "/page-2") == 0){
             strcpy(path, "/static/page2.html");
         }
 
-        if(strcmp(path, "/list") == 0){
+        else if(strcmp(path, "/list") == 0){
             strcpy(path, "/static/list.html");
         }
 
-        if(strcmp(path, "/200") == 0){
+        else if(strcmp(path, "/200") == 0){
             strcpy(path, "/static/response/200.html");
         }
 
-        if(strcmp(path, "/403") == 0){
+        else if(strcmp(path, "/403") == 0){
             strcpy(path, "/static/response/403.html");
         }
 
-        if(strstr(path, "..") != NULL){
+        else if(strstr(path, "..") != NULL){
             strcpy(path, "/static/response/403.html");  // You can make a 403.html
         }
 
-        if(strcmp(path, "/images") > 0){}
-        if(strcmp(path, "/js") > 0){}
-        if(strcmp(path, "/styles") > 0){}
+        else if(strncmp(path, "/images/", 8) == 0 ||
+         strncmp(path, "/js/", 4) == 0 ||
+         strncmp(path, "/styles/", 8) == 0){}
 
-        // else{
-        //     strcpy(path, "/static/response/404.html");
-        // }
+        else{
+            strcpy(path, "/static/response/404.html");
+        }
 
         // Construct full file path
         char full_path[2048];

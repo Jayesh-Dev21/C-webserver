@@ -47,6 +47,14 @@ int main(int argc, char* argv[]){
     }
     //bindfd returns 0 for success or -1 for ^^^ error 
     
+    int yes=1;
+    //char yes='1'; // Solaris people use this
+    // lose the pesky "Address already in use" error message
+    if(setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&yes,sizeof yes) == -1){
+        perror("setsockopt");
+        exit(1);
+    }
+
     // here backlog is how many pending connections you can have before the kernel starts rejecting new one
     if(-1 == listen(sockfd, backlog)){
         perror("Error establishing connection, check previous number of requests\n");

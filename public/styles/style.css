@@ -34,6 +34,6 @@ body {
     background-color: brown;
   }
   100% {
-    background-color: black;
+    background-color: rgb(133, 40, 199);
   }
 }

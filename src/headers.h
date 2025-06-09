@@ -12,3 +12,7 @@
 #include "error_logging.h"
 
 const char* get_mime_type(const char* path);
+void log_error(const char* type, const char* message, const char* extra);
+
+void log_event(FILE* log_dest, const char* level, const char* client_ip, int client_port,
+               const char* method, const char* path, const char* version, int status_code);

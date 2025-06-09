@@ -9,5 +9,6 @@
 #include <pthread.h> // for multithreaded
 #include <arpa/inet.h>
 #include "content_headers.h"
+#include "error_logging.h"
 
 const char* get_mime_type(const char* path);

@@ -1,6 +1,7 @@
 #include "headers.h" //all headers
 
 #define port 3003
+const unsigned short backlog = 10; 
 
 typedef enum{false,true}bool;
 
@@ -46,7 +47,6 @@ int main(int argc, char* argv[]){
     }
     //bindfd returns 0 for success or -1 for ^^^ error 
     
-    unsigned short backlog = 10; 
     // here backlog is how many pending connections you can have before the kernel starts rejecting new one
     if(-1 == listen(sockfd, backlog)){
         perror("Error establishing connection, check previous number of requests\n");
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]){
        int clientsocket = accept(sockfd, (struct sockaddr*)&hint, &addr_len);
         if(-1 == clientsocket){
             perror("Error accepting connection and reciveing a socket descriptor\n");
-            return error_ret();
+            continue;
         }
 
         memset(buff, 0, size_buff);
@@ -115,17 +115,27 @@ int main(int argc, char* argv[]){
             strcpy(path, "/static/response/403.html");
         }
 
-        else if(strstr(path, "..") != NULL){
-            strcpy(path, "/static/response/403.html");  // You can make a 403.html
-        }
+        // else if(strstr(path, "..") != NULL){
+        //     strcpy(path, "/static/response/403.html");  // You can make a 403.html
+        // }
 
         else if(strncmp(path, "/images/", 8) == 0 ||
          strncmp(path, "/js/", 4) == 0 ||
          strncmp(path, "/styles/", 8) == 0){}
 
-        else{
-            strcpy(path, "/static/response/404.html");
+        // else{
+        //     strcpy(path, "/static/response/404.html");
+        // }
+
+        // Prevent directory traversal
+        if (strstr(path, "..") != NULL) {
+            const char* forbidden = "HTTP/1.1 403 Forbidden\r\nContent-Length: 13\r\n\r\n403 Forbidden";
+            log_error("403", "Forbidden path", path);
+            write(clientsocket, forbidden, strlen(forbidden));
+            close(clientsocket);
+            continue;
         }
+
 
         // Construct full file path
         char full_path[2048];
@@ -139,11 +149,19 @@ int main(int argc, char* argv[]){
             continue;
         }
 
+
         fseek(file, 0, SEEK_END);
         long filesize = ftell(file);
         rewind(file);
 
         char* file_buf = malloc(filesize);
+        if (!file_buf) {
+            log_error("ERROR", "Memory allocation failed", full_path);
+            fclose(file);
+            close(clientsocket);
+            continue;
+        }
+
         fread(file_buf, 1, filesize, file);
         fclose(file);
 

@@ -8,7 +8,7 @@ HEADERS = $(wildcard src/*.h)
 
 OBJ = $(SRC:.c=.o)
 
-$(TARGET): $(OBJ)
+$(TARGET): $(OBJ) 
 	$(CC) $(OBJ) -o $(TARGET)
 # target app is compiled using the object files *.o
 

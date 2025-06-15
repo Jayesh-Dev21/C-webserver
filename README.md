@@ -2,6 +2,14 @@
 
 An HTTP protocol-based web server written in C for **CSOC'25**.
 
+```json
+{
+"Name": "Jayesh Krishan Puri",
+"Roll no.": 24155058,
+"Branch": "B.Tech Mining Engineering"
+}
+```
+
 ---
 
 ## 📜 Table of Contents

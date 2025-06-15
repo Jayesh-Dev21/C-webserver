@@ -2,7 +2,7 @@
 
 #define port 3003
 
-#define FILEPATH "../logs/server_activity.log"
+#define FILEPATH "logs/server_activity.log"
 const unsigned short backlog = 10; 
 
 typedef enum{false,true}bool;
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]){
 
     fprintf(stdout, "Server started on %d\nconnect via: http://localhost:%d\n", port, port);
 
-    FILE* log_file = fopen("accesslog.log", "a");
+    FILE* log_file = fopen(FILEPATH, "a");
     if (!log_file) {
         perror("Could not open log file");
         return error_ret();
@@ -212,7 +212,8 @@ int main(int argc, char* argv[]){
 
         close(clientsocket);
     }
-    
+
     fclose(log_file);
     return 0;   
+
 }

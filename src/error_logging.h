@@ -1,7 +1,6 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#ifndef ERROR_LOGGING_H
+#define ERROR_LOGGING_H
 
-void log_error(const char* type, const char* message, const char* extra){
-    fprintf(stderr, "[%s] %s: %s\n", type, message, extra);
-}
+void log_error(const char* type, const char* message, const char* extra);
+
+#endif

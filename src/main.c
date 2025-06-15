@@ -199,11 +199,20 @@ int main(int argc, char* argv[]){
         write(clientsocket, header, strlen(header));
         write(clientsocket, file_buf, filesize);
 
+        // adding log support
+        char client_ip[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));
+        int client_port = ntohs(client_addr.sin_port);
+        log_event_tofile(log_file, "200", client_ip, client_port, method, path, "1.1", 200);
+        log_event_tostdout("200", client_ip, client_port, method, path, "1.1", 200);
+
+
         free(file_buf);
         // ^^ ^^//
 
         close(clientsocket);
     }
     
+    fclose(log_file);
     return 0;   
 }

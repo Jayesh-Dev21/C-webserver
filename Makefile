@@ -3,6 +3,7 @@ CFLAGS = -Wall
 
 TARGET = webserver
 SRC = $(wildcard src/*.c)
+HEADERS = $(wildcard src/*.h)
 # searches for all *.c files in the directory
 
 OBJ = $(SRC:.c=.o)

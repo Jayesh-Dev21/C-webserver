@@ -1,6 +1,8 @@
 #include "headers.h" //all headers
 
 #define port 3003
+
+#define FILEPATH "../logs/server_activity.log"
 const unsigned short backlog = 10; 
 
 typedef enum{false,true}bool;
@@ -62,6 +64,15 @@ int main(int argc, char* argv[]){
     } 
 
     fprintf(stdout, "Server started on %d\nconnect via: http://localhost:%d\n", port, port);
+
+    FILE* log_file = fopen("accesslog.log", "a");
+    if (!log_file) {
+        perror("Could not open log file");
+        return error_ret();
+    }
+    
+    struct sockaddr_in client_addr;
+    socklen_t client_len = sizeof(client_addr);
 
     const char* response = "HTTP/1.1 200 OK\r\nContent-Length: 14\r\n\r\nHello, World!\n";
     const int response_len = strlen(response);
@@ -151,8 +162,15 @@ int main(int argc, char* argv[]){
 
         FILE* file = fopen(full_path, "rb");
         if (!file) {
-            const char* not_found = "HTTP/1.1 404 Not Found\r\nContent-Length: 13\r\n\r\n404 Not Found";
-            write(clientsocket, not_found, strlen(not_found));
+            const char* forbidden = "HTTP/1.1 403 Forbidden\r\nContent-Length: 13\r\n\r\n403 Forbidden";
+            write(clientsocket, forbidden, strlen(forbidden));
+
+            char client_ip[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, sizeof(client_ip));
+            int client_port = ntohs(client_addr.sin_port);
+            log_event_tofile(log_file, "403", client_ip, client_port, method, path, "1.1", 403);
+            log_event_tostdout("403", client_ip, client_port, method, path, "1.1", 403);
+
             close(clientsocket);
             continue;
         }

@@ -1,3 +1,3 @@
 # Server Logs
 
-Here, I have provide a smaple log of the server
+Here, I have provided a sample log of the server
